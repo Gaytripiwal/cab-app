@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import './LandingPage.css';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 // const [email, setEmail] = useState('');
 // const [password, setPassword] = useState('');
@@ -101,19 +103,23 @@ const LandingPage = () => {
 
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
       const loginData = {
         email,
         password,
-        role
+        role,
+        companyName,
+        companyId
       };
   
       // Add companyId only if role is "user"
-      if (role === 'user') {
-        loginData.companyId = 'OM001'; // or get from form/input
-      }
+
+      
+      // if (role === 'user') {
+      // }
   
       // Select the correct endpoint
       const endpoint =
@@ -121,6 +127,12 @@ const LandingPage = () => {
           ? 'http://localhost:5000/api/company/login'
           : 'http://localhost:5000/api/login';
   
+          if (role === 'user') {
+            navigate('/booking'); // Your route must match this
+          } else if (role === 'company') {
+            navigate('/company-dashboard'); // Optional: redirect for companies
+          }
+      
       console.log("Sending login data:", loginData);
   
       const response = await axios.post(endpoint, loginData);
@@ -232,8 +244,11 @@ const LandingPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            <button type="submit" className="btn btn-primary w-100">
+            <button type="submit" className="btn btn-primary w-100 mb-2">
               Login as {role === 'user' ? 'User' : 'Company'}
+            </button>
+            <button type="button" className="btn btn-outline-secondary w-100" onClick={handleCloseModal}>
+              Cancel
             </button>
           </form>
         </div>
