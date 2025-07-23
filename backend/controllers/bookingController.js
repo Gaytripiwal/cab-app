@@ -78,4 +78,17 @@ const getUserBookings = async (req, res) => {
   }
 };
 
-module.exports = { createBooking, getUserBookings };
+const getAllBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.find().populate('userId', 'employeeName email');
+    res.json({ bookings });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch all bookings', details: err.message });
+  }
+};
+
+module.exports = {
+  createBooking,
+  getUserBookings,
+  getAllBookings,
+};

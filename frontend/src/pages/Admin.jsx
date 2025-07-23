@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './Admin.css';
-import { FaUserPlus, FaSearch, FaEdit, FaTrash, FaCheckCircle } from 'react-icons/fa';
+import { FaUserPlus, FaSearch, FaEdit, FaTrash, FaCheckCircle, FaBars } from 'react-icons/fa';
 
 const MODULES = [
   { key: 'dashboard', label: 'Dashboard', icon: '📊' },
   { key: 'companies', label: 'Companies', icon: '🏢' },
   { key: 'employees', label: 'Employees', icon: '👥' },
-  { key: 'rides', label: 'Rides', icon: '🚕' },
+  { key: 'bookings', label: 'Bookings', icon: '🚕' },
   { key: 'billing', label: 'Billing & Revenue', icon: '💰' },
   { key: 'pricing', label: 'Pricing & Add-ons', icon: '⚙️' },
 ];
@@ -31,30 +31,78 @@ const DUMMY_EMPLOYEES = [
   { id: 1, name: 'John Doe', email: 'john.doe@company.com', contact: '+91 98765 43210', department: 'IT', branch: 'Bangalore', status: 'active' },
 ];
 
-const Admin = () => {
+const Admin = ({ sidebarOpen, setSidebarOpen }) => {
   const [active, setActive] = useState('dashboard');
   const [companies, setCompanies] = useState(DUMMY_COMPANIES);
-  const [newCompany, setNewCompany] = useState({ name: '', email: '', password: '' });
+  const [newCompany, setNewCompany] = useState({ companyName: '', companyId: '', email: '', password: '' });
   const [companyTab, setCompanyTab] = useState('register');
   const [employeeTab, setEmployeeTab] = useState('employee');
   const [employees, setEmployees] = useState(DUMMY_EMPLOYEES);
   const [search, setSearch] = useState('');
   const [newEmployee, setNewEmployee] = useState({ name: '', email: '', contact: '', department: '', branch: '' });
 
+  // Bookings state
+  const [bookings, setBookings] = useState([]);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [bookingsError, setBookingsError] = useState('');
+
   const handleCompanyInput = (e) => {
     const { name, value } = e.target;
     setNewCompany((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCompanyRegister = (e) => {
+  // const handleCompanyRegister = (e) => {
+  //   e.preventDefault();
+  //   if (!newCompany.name || !newCompany.email || !newCompany.password) return;
+  //   setCompanies((prev) => [
+  //     ...prev,
+  //     { id: prev.length + 1, name: newCompany.name, email: newCompany.email, status: 'Active' },
+  //   ]);
+  //   setNewCompany({ name: '', email: '', password: '' });
+  // };
+
+  const handleCompanyRegister = async (e) => {
     e.preventDefault();
-    if (!newCompany.name || !newCompany.email || !newCompany.password) return;
-    setCompanies((prev) => [
-      ...prev,
-      { id: prev.length + 1, name: newCompany.name, email: newCompany.email, status: 'Active' },
-    ]);
-    setNewCompany({ name: '', email: '', password: '' });
+  
+    if (!newCompany.companyName || !newCompany.companyId || !newCompany.email || !newCompany.password) return;
+  
+    try {
+      const response = await fetch('http://localhost:5000/api/company/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newCompany),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        // Update frontend state only if backend registration succeeds
+        setCompanies((prev) => [
+          ...prev,
+          {
+            id: prev.length + 1,
+            name: newCompany.companyName,
+            email: newCompany.email,
+            status: 'Active',
+          },
+        ]);
+        alert('Company registered successfully!');
+        setNewCompany({ companyName: '', companyId: '', email: '', password: '' });
+      } else {
+        // alert(Registration failed: ${data.message});
+      }
+    } catch (error) {
+      console.error('❌ Error registering company:', error);
+      alert('❌ Server error. Try again later.');
+    }
   };
+
+
+
+
+
 
   const filteredEmployees = employees.filter(emp =>
     emp.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -78,22 +126,73 @@ const Admin = () => {
     setEmployees((prev) => prev.filter(emp => emp.id !== id));
   };
 
+  // Close sidebar when a nav item is clicked (on mobile)
+  const handleNavClick = (key) => {
+    setActive(key);
+    setSidebarOpen(false);
+  };
+
+ 
+
+  React.useEffect(() => {
+    const fetchBookings = async () => {
+      if (active === 'bookings') {
+        setBookingsLoading(true);
+        setBookingsError('');
+        try {
+          const res = await fetch('http://localhost:5000/api/allBookings');
+          const data = await res.json();
+          console.log("Fetched bookings:", data);
+          console.log("Active Tab:", active);
+
+          if (data && Array.isArray(data.bookings)) {
+            setBookings(data.bookings);
+          } else {
+            setBookings([]);
+            setBookingsError('No bookings data received.');
+          }
+        } catch (error) {
+          console.error("Error fetching bookings:", error);
+          setBookings([]);
+          setBookingsError('Failed to fetch bookings.');
+        } finally {
+          setBookingsLoading(false);
+        }
+      }
+    };
+    fetchBookings();
+  }, [active]);
+  
+
   return (
     <>
       <Navbar />
+      {/* Sidebar hamburger for mobile, always visible below Navbar */}
+      <button
+        className="admin-hamburger admin-sidebar-hamburger"
+        style={{ display: 'flex', margin: '16px 0 8px 16px', zIndex: 1101 }}
+        onClick={() => setSidebarOpen && setSidebarOpen(true)}
+        aria-label="Open sidebar menu"
+        type="button"
+      >
+        <FaBars />
+      </button>
       <div className="admin-root-premium">
-        <aside className="admin-sidebar-premium">
+        {/* Sidebar with open/close logic */}
+        <aside className={`admin-sidebar-premium${sidebarOpen ? ' open' : ''}`}>
           <div className="admin-sidebar-title">Super Admin</div>
           <ul className="admin-nav-premium">
             {MODULES.map(m => (
               <li key={m.key}>
-                <button className={active === m.key ? 'active' : ''} onClick={() => setActive(m.key)}>
+                <button className={active === m.key ? 'active' : ''} onClick={() => handleNavClick(m.key)}>
                   <span className="admin-nav-icon">{m.icon}</span> {m.label}
                 </button>
               </li>
             ))}
           </ul>
         </aside>
+        {/* Overlay for closing sidebar on mobile */}
+        {sidebarOpen && <div className="admin-sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>}
         <main className="admin-main-premium">
           <div className="admin-header-bar">{MODULES.find(m => m.key === active)?.label}</div>
           {active === 'dashboard' && (
@@ -124,7 +223,8 @@ const Admin = () => {
                 <div className="admin-company-form-card">
                   <h3>Register New Company</h3>
                   <form className="admin-company-form" onSubmit={handleCompanyRegister} autoComplete="off">
-                    <input type="text" name="name" placeholder="Company Name" value={newCompany.name} onChange={handleCompanyInput} required />
+                    <input type="text" name="companyName" placeholder="Company Name" value={newCompany.companyName} onChange={handleCompanyInput} required />
+                    <input type="text" name="companyId" placeholder="Company ID" value={newCompany.companyId} onChange={handleCompanyInput} required />
                     <input type="email" name="email" placeholder="Company Email" value={newCompany.email} onChange={handleCompanyInput} required />
                     <input type="password" name="password" placeholder="Password" value={newCompany.password} onChange={handleCompanyInput} required />
                     <button type="submit">Register Company</button>
@@ -247,6 +347,47 @@ const Admin = () => {
               <div className="admin-table-placeholder">[Billing: Company invoices, revenue by period, exports]</div>
             </section>
           )}
+          {active === 'bookings' && (
+            <section style={{ background: '#fff', borderRadius: 14, padding: 24, boxShadow: '0 2px 12px #2b7cff11', border: '1px solid #e5e7eb' }}>
+              <h3 style={{ color: '#2b7cff', fontWeight: 700, marginBottom: 18 }}>All Bookings</h3>
+              {bookingsLoading ? (
+                <div style={{ textAlign: 'center', color: '#2b7cff', padding: 24 }}>Loading bookings...</div>
+              ) : bookingsError ? (
+                <div style={{ textAlign: 'center', color: '#ff6b81', padding: 24 }}>{bookingsError}</div>
+              ) : bookings.length === 0 ? (
+                <div style={{ textAlign: 'center', color: '#888', padding: 24 }}>No bookings found.</div>
+              ) : (
+                <div className="admin-table-premium">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Booking ID</th>
+                        <th>Employee Name</th>
+                        <th>Email</th>
+                        <th>Pickup</th>
+                        <th>Drop</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bookings.map((b, idx) => (
+                        <tr key={b._id || idx}>
+                          <td>{b._id}</td>
+                          <td>{b.userId?.employeeName || '-'}</td>
+                          <td>{b.userId?.email || '-'}</td>
+                          <td>{b.pickup || '-'}</td>
+                          <td>{b.dropoff || '-'}</td>
+                          <td>{b.date ? new Date(b.date).toLocaleString() : '-'}</td>
+                          <td>{b.status || '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          )}
           {active === 'pricing' && (
             <section>
               <div className="admin-table-placeholder">[Pricing controls: Base fare, per km, stay charges, extras]</div>
@@ -259,4 +400,4 @@ const Admin = () => {
   );
 };
 
-export default Admin; 
+export default Admin;

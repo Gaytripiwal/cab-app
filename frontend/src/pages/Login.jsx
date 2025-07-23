@@ -32,7 +32,9 @@ const Login = () => {
     email: '',
     password: '',
     companyId: '',
-    companyName: ''
+    companyName: '',
+    employeeId: '',
+    employeeName: ''
   });
   const navigate = useNavigate();
 
@@ -118,6 +120,28 @@ const Login = () => {
                         name="companyName"
                         placeholder="Enter Company Name"
                         value={loginData.companyName}
+                        onChange={handleInput}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Employee Id</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="employeeId"
+                        placeholder="Enter Employee Id"
+                        value={loginData.employeeId}
+                        onChange={handleInput}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Employee Name</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="employeeName"
+                        placeholder="Enter Employee Name"
+                        value={loginData.employeeName}
                         onChange={handleInput}
                       />
                     </div>

@@ -12,6 +12,12 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Profile from './pages/Profile';
 import RideHistory from './pages/RideHistory';
 import AdminLogin from './pages/AdminLogin';
+import React, { useState } from 'react';
+
+function AdminRouteWrapper() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  return <Admin sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />;
+}
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -50,7 +56,7 @@ function AnimatedRoutes() {
         <Route path="/admin" element={
           <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.4, ease: 'easeInOut' }}>
             <ProtectedRoute requiredRole="admin">
-              <Admin />
+              <AdminRouteWrapper />
             </ProtectedRoute>
           </motion.div>
         } />
