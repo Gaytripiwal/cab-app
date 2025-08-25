@@ -1,3 +1,67 @@
+<<<<<<< HEAD
+=======
+// const express = require('express');
+// const router = express.Router();
+// const Company = require('../models/company');
+// const jwt = require('jsonwebtoken');
+// const bcrypt = require('bcryptjs');
+
+// // Fix these values as your "database"
+// const FIXED_EMAIL = 'company@omcab.com';
+// const FIXED_PASSWORD = 'company123';
+
+// // POST /api/company/login
+// router.post('/company/login', async (req, res) => {
+//     const { email, password } = req.body;
+
+//     // Check against fixed values
+//     if (email !== FIXED_EMAIL) {
+//         return res.status(400).json({ message: 'Company not found' });
+//     }
+//     if (password !== FIXED_PASSWORD) {
+//         return res.status(400).json({ message: 'Invalid password' });
+//     }
+
+//     // Find the company in the database to get its _id
+//     const company = await Company.findOne({ email });
+//     if (!company) {
+//         return res.status(400).json({ message: 'Company not found in DB' });
+//     }
+
+//     // Generate a token for the company, including its id
+//     const token = jwt.sign({ id: company._id, email, role: 'company' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+//     res.json({ message: 'Login successful', token });
+// });
+
+// // POST /api/company/register
+// router.post('/register', async (req, res) => {
+//     const { companyName, companyId, email, password } = req.body;
+//     if (!companyName || !companyId || !email || !password) {
+//         return res.status(400).json({ message: 'All fields are required' });
+//     }
+//     try {
+//         // Check for existing company
+//         const existing = await Company.findOne({ $or: [{ email }, { companyId }] });
+//         if (existing) {
+//             return res.status(400).json({ message: 'Company with this email or ID already exists' });
+//         }
+//         const hashedPassword = await bcrypt.hash(password, 10);
+//         const company = await Company.create({
+//             companyName,
+//             companyId,
+//             email,
+//             password: hashedPassword
+//         });
+//         res.status(201).json({ message: 'Company registered', company: { companyName, companyId, email } });
+//     } catch (err) {
+//         res.status(500).json({ message: 'Server error', error: err.message });
+//     }
+// });
+
+// module.exports = router;
+
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e
 
 const express = require('express');
 const router = express.Router();
@@ -6,6 +70,7 @@ const Company = require('../models/company');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
+<<<<<<< HEAD
 // Get all companies (for admin use)
 router.get('/', async (req, res) => {
   try {
@@ -18,6 +83,10 @@ router.get('/', async (req, res) => {
 
 // Register Company
 router.post('/register', async (req, res) => {
+=======
+// Register Company
+router.post('/company/register', async (req, res) => {
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e
   try {
     const { companyName, companyId, email, password } = req.body;
     if (!companyName || !companyId || !email || !password) {
@@ -100,7 +169,11 @@ router.post('/employees', verifyCompanyToken, async (req, res) => {
 });
 
 // Company Login
+<<<<<<< HEAD
 router.post('/login', async (req, res) => {
+=======
+router.post('/company/login', async (req, res) => {
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e
   const { email, password } = req.body;
   const company = await Company.findOne({ email });
   if (!company) {
@@ -114,6 +187,7 @@ router.post('/login', async (req, res) => {
   res.json({ message: 'Login successful', token });
 });
 
+<<<<<<< HEAD
 
 // GET /api/company/employees
 router.get('/employees', verifyCompanyToken, async (req, res) => {
@@ -226,4 +300,6 @@ router.get('/bookings', verifyCompanyToken, async (req, res) => {
   }
 });
 
+=======
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e
 module.exports = router;

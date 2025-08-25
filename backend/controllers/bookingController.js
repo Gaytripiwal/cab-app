@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 
@@ -138,6 +139,57 @@ const createBooking = async (req, res) => {
         }
       }
     }
+=======
+const Booking = require('../models/booking');
+
+// Simple distance matrix (in km) for the provided locations
+const LOCATIONS = ['TV Center', 'CIDCO', '7Hills', 'Thakare Nagar', 'Jadhwadi', 'Gajanan Mandir'];
+const DIST_MATRIX = {
+  'TV Center':      [0, 4, 7, 6, 8, 10],
+  'CIDCO':          [4, 0, 3, 2, 5, 7],
+  '7Hills':         [7, 3, 0, 4, 6, 8],
+  'Thakare Nagar':  [6, 2, 4, 0, 3, 5],
+  'Jadhavwadi':       [8, 5, 6, 3, 0, 2],
+  'Gajanan Mandir': [10, 7, 8, 5, 2, 0],
+};
+
+// Fare per km for each cab type
+const FARE_PER_KM = {
+  Mini: 10,
+  Sedan: 14,
+  SUV: 18,
+  Luxury: 25,
+};
+
+function getDistance(pickup, dropoff) {
+  if (!LOCATIONS.includes(pickup) || !LOCATIONS.includes(dropoff)) return 5; // default 5km for manual entry
+  const i = LOCATIONS.indexOf(pickup);
+  const j = LOCATIONS.indexOf(dropoff);
+  return DIST_MATRIX[pickup][j];
+}
+
+const createBooking = async (req, res) => {
+  try {
+    console.log('Server time:', new Date());
+    const {
+      pickup,
+      dropoff,
+      date,
+      time,
+      cabType,
+      passengers,
+      includeReturn,
+      returnDate,
+      returnTime
+    } = req.body;
+
+    // Calculate distance and fare
+    const distance = getDistance(pickup, dropoff);
+    const baseFare = FARE_PER_KM[cabType] || 10;
+    let fare = distance * baseFare;
+    if (includeReturn) fare *= 2;
+    fare = Math.round(fare);
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e
 
     const newBooking = await Booking.create({
       pickup,
@@ -145,6 +197,7 @@ const createBooking = async (req, res) => {
       date,
       time,
       cabType,
+<<<<<<< HEAD
       tripType,
       passengers,
       includeReturn,
@@ -180,11 +233,23 @@ const createBooking = async (req, res) => {
       fare: finalFare, 
       distance: finalDistance 
     });
+=======
+      passengers,
+      includeReturn,
+      returnDate,
+      returnTime,
+      fare,
+      distance,
+      userId: req.user.id // Associate booking with the current user
+    });
+    res.status(201).json({ message: 'Booking successful', booking: newBooking, fare, distance });
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e
   } catch (err) {
     res.status(500).json({ error: 'Booking failed', details: err.message });
   }
 };
 
+<<<<<<< HEAD
 // ------------------------------
 // Get All Bookings (Admin)
 // ------------------------------
@@ -430,6 +495,9 @@ const getAllBookings = async (req, res) => {
 // ------------------------------
 // Get User's Bookings (My Bookings)
 // ------------------------------
+=======
+// Get all bookings for the current user (ride history)
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e
 const getUserBookings = async (req, res) => {
   try {
     const bookings = await Booking.find({ userId: req.user.id }).sort({ createdAt: -1 });
@@ -439,6 +507,7 @@ const getUserBookings = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 
 const assignDriverToBooking = async (req, res) => {
   try {
@@ -647,3 +716,19 @@ module.exports = {
   },
 
 };
+=======
+const getAllBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.find().populate('userId', 'employeeName email');
+    res.json({ bookings });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch all bookings', details: err.message });
+  }
+};
+
+module.exports = {
+  createBooking,
+  getUserBookings,
+  getAllBookings,
+};
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e

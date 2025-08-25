@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 const express = require('express');
@@ -12,6 +13,10 @@ const {
   getMyBookings, // <-- add this
   assignVehicleToBooking // New controller function for vehicle assignment
 } = require('../controllers/bookingController');
+=======
+const express = require('express')
+const { createBooking, getUserBookings, getAllBookings } = require('../controllers/bookingController');
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e
 const auth = require('../auth');
 
 const router = express.Router();
@@ -19,6 +24,7 @@ const router = express.Router();
 // Create a new booking (user)
 router.post('/createBooking', auth, createBooking);
 
+<<<<<<< HEAD
 // Get logged-in user's bookings
 router.get('/myBookings', auth, getMyBookings);
 
@@ -69,3 +75,9 @@ router.put('/updateStatus/:id', updateBookingStatusByDriver);
 
 
 module.exports = router;
+=======
+// Get all bookings (admin/company usage)
+router.get('/allBookings', getAllBookings);
+
+module.exports =  router;
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e

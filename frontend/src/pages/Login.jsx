@@ -30,7 +30,10 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState({
     email: '',
+<<<<<<< HEAD
     phoneNumber: '',
+=======
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e
     password: '',
     companyId: '',
     companyName: '',
@@ -47,6 +50,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+<<<<<<< HEAD
       let endpoint;
       let payload = { ...loginData };
       
@@ -110,10 +114,29 @@ const Login = () => {
     } catch (error) {
       console.error('Login error:', error);
       console.error('Error response:', error.response?.data);
+=======
+      const endpoint =
+        role === 'company'
+          ? 'http://localhost:5000/api/company/login'
+          : 'http://localhost:5000/api/login';
+      const response = await axios.post(endpoint, {
+        ...loginData,
+        role
+      });
+      localStorage.setItem('token', response.data.token);
+      toast.success('Login successful!');
+      if (role === 'user') {
+        navigate('/booking');
+      } else {
+        navigate('/company-dashboard');
+      }
+    } catch (error) {
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e
       toast.error(error.response?.data?.message || 'Login failed');
     }
   };
 
+<<<<<<< HEAD
   // Render role-specific form fields
   const renderRoleSpecificFields = () => {
     if (role === 'driver') {
@@ -189,6 +212,8 @@ const Login = () => {
     return null;
   };
 
+=======
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e
   return (
     <>
       <Navbar />
@@ -200,11 +225,15 @@ const Login = () => {
             <h2 className="reg-title">Welcome Back</h2>
             <p className="reg-desc">Login to CabApp and manage or book your rides.</p>
           </div>
+<<<<<<< HEAD
           
+=======
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e
           {/* Login Form */}
           <div className="reg-form-col">
             <div className="reg-form-inner">
               <h3 className="reg-form-heading">Login</h3>
+<<<<<<< HEAD
               
               {/* Role Switcher */}
               <div className="d-flex justify-content-center mb-3" style={{gap: '10px'}}>
@@ -359,6 +388,110 @@ const Login = () => {
                     Company registration? <a href="/company-register" className="text-primary">Contact us</a>
                   </p>
                 )}
+=======
+              {/* Role Switcher */}
+              <div className="d-flex justify-content-center mb-3" style={{gap: 10}}>
+                <button
+                  className={`btn btn-sm ${role === 'user' ? 'btn-info' : 'btn-outline-info'}`}
+                  style={{borderRadius: 8, minWidth: 90, fontWeight: 600, color: role === 'user' ? '#fff' : '#2b7cff', background: role === 'user' ? '#2b7cff' : '#fff', border: '1.5px solid #2b7cff', transition: 'all 0.2s'}}
+                  onClick={() => setRole('user')}
+                >
+                  <span role="img" aria-label="user" style={{marginRight:6}}>🧑</span> User
+                </button>
+                <button
+                  className={`btn btn-sm ${role === 'company' ? 'btn-info' : 'btn-outline-info'}`}
+                  style={{borderRadius: 8, minWidth: 90, fontWeight: 600, color: role === 'company' ? '#fff' : '#2b7cff', background: role === 'company' ? '#2b7cff' : '#fff', border: '1.5px solid #2b7cff', transition: 'all 0.2s'}}
+                  onClick={() => setRole('company')}
+                >
+                  <span role="img" aria-label="company" style={{marginRight:6}}>🏢</span> Company
+                </button>
+              </div>
+              <form onSubmit={handleLogin} autoComplete="off">
+                {role === 'user' && (
+                  <>
+                    <div className="mb-3">
+                      <label className="form-label">Company ID</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="companyId"
+                        placeholder="Enter Company ID"
+                        value={loginData.companyId}
+                        onChange={handleInput}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Company Name</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="companyName"
+                        placeholder="Enter Company Name"
+                        value={loginData.companyName}
+                        onChange={handleInput}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Employee Id</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="employeeId"
+                        placeholder="Enter Employee Id"
+                        value={loginData.employeeId}
+                        onChange={handleInput}
+                      />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Employee Name</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="employeeName"
+                        placeholder="Enter Employee Name"
+                        value={loginData.employeeName}
+                        onChange={handleInput}
+                      />
+                    </div>
+                  </>
+                )}
+                <div className="mb-3">
+                  <label className="form-label">Email address</label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    name="email"
+                    placeholder="Enter email"
+                    value={loginData.email}
+                    onChange={handleInput}
+                    required
+                  />
+                </div>
+                <div className="mb-3" style={{position:'relative'}}>
+                  <label className="form-label">Password</label>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    className="form-control"
+                    name="password"
+                    placeholder="Password"
+                    value={loginData.password}
+                    onChange={handleInput}
+                    required
+                  />
+                  <span
+                    onClick={() => setShowPassword(prev => !prev)}
+                    style={{position:'absolute', right:12, top:38, cursor:'pointer', fontSize:'1.2rem', color:'#888'}}
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? '🙈' : '👁️'}
+                  </span>
+                </div>
+                <button type="submit" className="btn btn-primary w-100 mb-2 reg-btn-responsive">Login as {role === 'user' ? 'User' : 'Company'}</button>
+              </form>
+              <div className="text-center mt-3" style={{fontSize:'0.98rem'}}>
+                Don&apos;t have an account?{' '}
+                <a href="/register" style={{color:'#2b7cff', textDecoration:'underline', fontWeight:600}}>Register</a>
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e
               </div>
             </div>
           </div>
@@ -488,4 +621,8 @@ const Login = () => {
   );
 };
 
+<<<<<<< HEAD
 export default Login;
+=======
+export default Login; 
+>>>>>>> 18b3bb154fe4bc562397050ecc39746c89c3272e
